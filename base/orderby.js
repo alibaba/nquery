@@ -1,15 +1,22 @@
+// (C) 2011-2013 Alibaba Group Holding Limited.
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License 
+// version 2 as published by the Free Software Foundation. 
 
-var AstHelper = require('./ast_helper');
+// Author :windyrobin <windyrobin@Gmail.com>
+
+var AstHelper = require('../lib/ast_helper');
+
+module.exports = orderby;
 
 function debug(str){
-  console.log(str);
+  //console.log(str);
 }
 
 function inspect(obj){
-  console.log(require("util").inspect(obj, false, 10));
+  //console.log(require("util").inspect(obj, false, 10));
 }
 
-module.exports = orderby;
 /** 
  * @param {Array} orderby  [{name : 'col1' , type : "ASC"}, ...]
  */

@@ -3,7 +3,8 @@ var should = require('should');
 var Parser = require('../../lib/parser');
 var AstHelper = require('../../lib/ast_helper');
 var createBinaryExpr = AstHelper.createBinaryExpr;
-var filter = require('../../lib/column');
+
+var filter = require('../../base/column');
 
 var AstReader = AstHelper.Reader;
 
@@ -15,9 +16,9 @@ describe('column filter test', function(){
   it('column simple select', function(){
     var rawData = { 
       columns: [
-        ['a.id', 'b.id'],
-        ['a.name'],
-        ['b.type']
+        [{table : 'a', column : 'id'}, {table : 'b', column : 'id'}],
+        [{table : 'a', column : 'name'}],
+        [{table : 'b', column : 'type'}]
       ],
       data: [ 
         [ 1, 'a', 't1' ], 
@@ -30,8 +31,8 @@ describe('column filter test', function(){
       ] 
     };
 
-    var idSel = {type : 'column_ref', column : 'a.id'};
-    var typeSel = {type : 'column_ref', column : 'b.type'};
+    var idSel = {type : 'column_ref', table : 'a', column : 'id'};
+    var typeSel = {type : 'column_ref', table : 'b', column : 'type'};
     //sm.where('a.id',WHERE.EQ, 3);
     //inspect(e);
     var e = {
@@ -80,9 +81,9 @@ describe('column filter test', function(){
   it('all scan ', function(){
     var rawData = { 
       columns: [
-        ['a.id', 'b.id'],
-        ['a.name'],
-        ['b.type']
+        [{table : 'a', column : 'id'}, {table : 'b', column : 'id'}],
+        [{table : 'a', column : 'name'}],
+        [{table : 'b', column : 'type'}]
       ],
       data: [ 
         [ 1, 'a', 't1' ], 
@@ -101,9 +102,9 @@ describe('column filter test', function(){
   it('alias select ', function(){
     var rawData = { 
       columns: [
-        ['a.id', 'b.id'],
-        ['a.name'],
-        ['b.type']
+        [{table : 'a', column : 'id'}, {table : 'b', column : 'id'}],
+        [{table : 'a', column : 'name'}],
+        [{table : 'b', column : 'type'}]
       ],
       data: [ 
         [ 1, 'a', 't1' ], 
@@ -120,11 +121,10 @@ describe('column filter test', function(){
         {expr : typeSel, as : ''}
       ]  
     }
-
     var res = filter(rawData, e.columns); 
     res.columns.should.eql([
-        ['a.id', 'aaid'],
-        ['b.type']
+        [{table : 'a', column : 'id'}, {table : '', column : 'aaid'}],
+        [{table : 'b', column : 'type'}]
     ]);
   });
 
@@ -132,9 +132,9 @@ describe('column filter test', function(){
   it('calculation select ', function(){
     var rawData = { 
       columns: [
-        ['a.id', 'b.id'],
-        ['a.name'],
-        ['b.type']
+        [{table : 'a', column : 'id'}, {table : 'b', column : 'id'}],
+        [{table : 'a', column : 'name'}],
+        [{table : 'b', column : 'type'}]
       ],
       data: [ 
         [ 1, 'a', 't1' ], 
@@ -173,9 +173,9 @@ describe('column filter test', function(){
   it('complicated calculation select ', function(){
     var rawData = { 
       columns: [
-        ['a.id', 'b.id'],
-        ['a.name'],
-        ['b.type']
+        [{table : 'a', column : 'id'}, {table : 'b', column : 'id'}],
+        [{table : 'a', column : 'name'}],
+        [{table : 'b', column : 'type'}]
       ],
       data: [ 
         [ 1, 'a', 5 ], 
@@ -207,7 +207,7 @@ describe('column filter test', function(){
     res = filter(rawData, e.columns); 
     res.should.eql({
       columns : [
-        ['a.id + b.type', 'id_type_add'] 
+        [{table : '', column : 'a.id + b.type'}, {table : '', column : 'id_type_add'}] 
       ],
       data : [
         [ 6 ], 

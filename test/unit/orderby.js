@@ -1,5 +1,6 @@
 var should = require('should');
-var doOrderby = require('../../lib/orderby');
+var doOrderby = require('../../base/orderby');
+
 var AstReader = require('../../lib/ast_helper').Reader;
 
 function inspect(obj) {
@@ -10,7 +11,7 @@ describe('orderby  test', function(){
 
   it('basic test', function() {
     var rawData = { 
-      columns: [ ['id'], ['sex'] ],
+      columns: [[{table : '', column : 'id'}], [{table : '', column : 'sex'}]],
       data: [ 
         [ 3, 'a' ], 
         [ 4, 'f' ], 
@@ -41,8 +42,8 @@ describe('orderby  test', function(){
     }
     var sp = new AstReader(ast);
     var ed = doOrderby(rawData, [
-      {name : 'sex', type : 'ASC'},
-      {name : 'id',  type : 'DESC'}
+      {name : {table : '', column : 'sex'}, type : 'ASC'},
+      {name : {table : '', column : 'id'},  type : 'DESC'}
     ]);
     //inspect(ed);
     ed.data.should.eql([ 

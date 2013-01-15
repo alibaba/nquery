@@ -1,3 +1,10 @@
+// (C) 2011-2012 Alibaba Group Holding Limited.
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License 
+// version 2 as published by the Free Software Foundation. 
+
+// Author :windyrobin <windyrobin@Gmail.com>
+
 {
   var util = require('util');
 
@@ -135,15 +142,23 @@
 
   //used for store refered parmas
   var params = [];
+
+  //used for dependency analysis
+  var varList = [];
 }
 
 start 
-  = &init ast:(union_stmt  / update_stmt / replace_insert_stmt) {
+  = &init __ ast:(union_stmt  / update_stmt / replace_insert_stmt) {
       return {
         ast   : ast,
         param : params
       } 
     } 
+    /ast:proc_stmts {
+      return {
+        ast : ast  
+      }
+    }
 
 init  = { params = []; return true; }
 
@@ -224,6 +239,10 @@ table_ref
   
 table_join 
   = op:join_op __ t:table_base __ expr:on_clause? {
+    t.join = op;
+    t.on   = expr;
+    return t;
+    /*
       return  {
         db    : t.db,
         table : t.table,
@@ -231,14 +250,21 @@ table_join
         join  : op,
         on    : expr
       }
+    */
     } 
  
+//NOTE that ,the table assigned to `var` shouldn't write in `table_join`
 table_base 
-  =  t:table_name __ KW_AS? __ alias:ident? {
-      return  {
-        db    : t.db,
-        table : t.table,
-        as    : alias
+  = t:table_name __ KW_AS? __ alias:ident? {
+      if (t.type == 'var') {
+        t.as = alias;
+        return t;
+      } else {
+        return  {
+          db    : t.db,
+          table : t.table,
+          as    : alias
+        }
       }
     } 
 
@@ -257,6 +283,11 @@ table_name
         obj.table = tail[3];
       } 
       return obj;
+    }
+    /v:var_decl {
+      v.db = '';
+      v.table = v.name;
+      return v;
     }
 
 on_clause 
@@ -531,12 +562,24 @@ in_op_right
         right : l
       }
     }
+  / op:in_op __ e:var_decl {
+      return {
+        op    : op,  
+        right : e
+      }
+    }
 
 contains_op_right
   = op:contains_op __ LPAREN  __ l:expr_list __ RPAREN {
       return {
         op    : op,  
         right : l
+      }
+    }
+  / op:contains_op __ e:var_decl {
+      return {
+        op    : op,  
+        right : e
       }
     }
 
@@ -568,6 +611,7 @@ primary
       e.paren = true; 
       return e; 
     } 
+  / var_decl
 
 column_ref 
   = tbl:ident __ DOT __ col:column { 
@@ -855,6 +899,9 @@ STAR      = '*'
 LPAREN    = '('
 RPAREN    = ')'
 
+LBRAKE    = '['
+RBRAKE    = ']'
+
 __ =
   whitespace*
 
@@ -869,4 +916,125 @@ EOL
   
 EOF = !.
 
+//begin procedure extension
+proc_stmts 
+  = proc_stmt* 
 
+proc_stmt 
+  = &proc_init __ s:(assign_stmt / return_stmt) {
+      return {
+        stmt : s,
+        vars: varList
+      }
+    }
+
+proc_init  = { varList = []; return true; }
+
+assign_stmt 
+  = va:var_decl __ KW_ASSIGN __ e:proc_expr {
+    return {
+      type : 'assign',
+      left : va,
+      right: e
+    }
+  }
+
+return_stmt 
+  = KW_RETURN __ e:proc_expr {
+  return {
+    type : 'return',
+    expr: e
+  }
+}
+
+proc_expr 
+  = select_stmt 
+  / proc_join 
+  / proc_additive_expr 
+  / proc_array
+
+proc_additive_expr
+  = head:proc_multiplicative_expr
+    tail:(__ additive_operator  __ proc_multiplicative_expr)* {
+      return createBinaryExprChain(head, tail);
+    }
+
+proc_multiplicative_expr
+  = head:proc_primary
+    tail:(__ multiplicative_operator  __ proc_primary)* {
+      return createBinaryExprChain(head, tail);
+    }
+
+proc_join
+  = lt:var_decl __ op:join_op  __ rt:var_decl __ expr:on_clause {
+      return {
+        type    : 'join',
+        ltable  : lt, 
+        rtable  : rt,
+        op      : op,
+        on      : expr
+      }
+    }
+
+proc_primary 
+  = literal
+  / var_decl
+  / proc_func_call 
+  / param
+  / LPAREN __ e:proc_additive_expr __ RPAREN { 
+      e.paren = true; 
+      return e; 
+    } 
+
+proc_func_call
+  = name:ident __ LPAREN __ l:proc_primary_list __ RPAREN {
+      //compatible with original func_call
+      return {
+        type : 'function',
+        name : name, 
+        args : {
+          type  : 'expr_list',
+          value : l
+        }
+      }
+    }
+
+proc_primary_list 
+  = head:proc_primary tail:(__ COMMA __ proc_primary)* {
+      return createList(head, tail);
+    } 
+
+proc_array = 
+  LBRAKE __ l:proc_primary_list __ RBRAKE {
+    return {
+      type : 'array',
+      value : l
+    }
+  }
+
+
+var_decl 
+  = KW_VAR_PRE name:ident_name m:mem_chain {
+    //push for analysis
+    varList.push(name);
+    return {
+      type : 'var',
+      name : name,
+      members : m
+    }
+  } 
+
+mem_chain 
+  = l:('.' ident_name)* {
+    var s = [];
+    for (var i = 0; i < l.length; i++) {
+      s.push(l[i][1]); 
+    }
+    return s;
+  }
+
+ KW_VAR_PRE = '$'
+
+ KW_RETURN = 'return'i
+
+ KW_ASSIGN = ':='

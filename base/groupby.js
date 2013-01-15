@@ -1,3 +1,15 @@
+// (C) 2011-2013 Alibaba Group Holding Limited.
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License 
+// version 2 as published by the Free Software Foundation. 
+
+// Author :windyrobin <windyrobin@Gmail.com>
+
+
+var AstHelper     = require('../lib/ast_helper');
+
+module.exports = doGroupby;
+
 function debug(str){
   //console.log(str);
 }
@@ -5,6 +17,8 @@ function debug(str){
 function inspect(obj){
   //console.log(require("util").inspect(obj, false, 10));
 }
+
+var getRefColPos  = AstHelper.getRefColPos;
 
 function genGbKey(args){
   var keys = [];
@@ -15,23 +29,14 @@ function genGbKey(args){
   return keys.join('__');
 }
 
-module.exports = doGroupby;
-
 function doGroupby(dc, gb) {
   var i, j;
   var columns = dc.columns;
   var data = dc.data;
 
   var gbPos = [];
-  for(i = 0; i < gb.length; i++){
-    var gCol = gb[i]
-    for(j = 0; j < columns.length; j++){
-      if(columns[j].indexOf(gCol) >= 0){
-        gbPos[i] = j;
-        break;
-      }
-    }
-  }
+  gbPos = getRefColPos(gb, columns);
+
   var res = {};
   for (i = 0; i < data.length; i++) {
     var gCols = [];
@@ -49,6 +54,5 @@ function doGroupby(dc, gb) {
     }
     res[key].data.push(d);
   }
-
   return res;
 }

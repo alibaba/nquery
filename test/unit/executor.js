@@ -1,4 +1,5 @@
 var should   = require('should');
+var Parser   = require('../../lib/parser');
 var Executor = require('../../lib/executor');
 
 function debug(str) {
@@ -11,7 +12,9 @@ function inspect(obj) {
 
 describe('executor test', function(){
   var rawData = { 
-    columns: [ 'id', 'sex' ],
+    columns: [ 
+      'id', 'sex'
+     ],
     data: [ 
       [ 3, 'f' ], 
       [ 4, 'f' ], 
@@ -22,29 +25,44 @@ describe('executor test', function(){
   };
 
   it('column all test', function(done){
-    var str;
+    var str, ast;
 
     str = 'select * from a'
-    Executor.setLoader(function(ar, cb){
-      cb(null, rawData);
+    ast = Parser.parse(str);
+    Executor.setLoader(function(ar, env, cb){
+      cb(null, rawData, ar);
     });
 
-    Executor.runSQL(str, function(err, dc){
+    Executor.runAST(ast, function(err, dc){
       if (err) {
         debug(err.stack);
       } else {
-        dc.should.eql(rawData);
+        dc.should.eql({
+          columns: [ 
+            'id', 'sex'
+          ],
+          data: [ 
+            [ 3, 'f' ], 
+            [ 4, 'f' ], 
+            [ 6, 'f' ], 
+            [ 8, 'f' ], 
+            [ 10, 'f' ] 
+          ] 
+        });
         done();
       }
     });
   });
 
   it('column select test', function(done){
-    var str = 'select id from a'
-    Executor.setLoader(function(ar, cb){
-      cb(null, rawData);
+    var str = 'select id from a';
+    var ast = Parser.parse(str);
+
+    Executor.setLoader(function(ar, env, cb){
+      cb(null, rawData, ar);
     });
-    Executor.runSQL(str, function(err, dc){
+
+    Executor.runAST(ast, function(err, dc){
       if (err) {
         debug(err.stack);
       } else {
@@ -65,10 +83,11 @@ describe('executor test', function(){
 
   it('as column name replace ', function(done){
     var str = 'select id as rid, sex as rsex from a'
-    Executor.setLoader(function(ar, cb){
-      cb(null, rawData);
+    Executor.setLoader(function(ar, env, cb){
+      cb(null, rawData, ar);
     });
-    Executor.runSQL(str, function(err, dc){
+    var ast = Parser.parse(str);
+    Executor.runAST(ast, function(err, dc){
       if (err) {
         debug(err.stack);
       } else {
@@ -89,11 +108,12 @@ describe('executor test', function(){
 
   it('limits filter test', function(done){
     var str = 'select * from a limit 1, 2'
-    Executor.setLoader(function(ar, cb){
-      cb(null, rawData);
+    Executor.setLoader(function(ar, env, cb){
+      cb(null, rawData, ar);
     });
 
-    Executor.runSQL(str, function(err, dc){
+    var ast = Parser.parse(str);
+    Executor.runAST(ast, function(err, dc){
       if (err) {
         debug(err.stack);
       } else {
@@ -111,7 +131,9 @@ describe('executor test', function(){
 
   it('order filter test', function(done){
     var rawData = { 
-      columns: [ 'id', 'sex' ],
+      columns: [ 
+        'id', 'sex'
+      ],
       data: [ 
         [ 3, 'a' ], 
         [ 4, 'f' ], 
@@ -121,11 +143,12 @@ describe('executor test', function(){
       ] 
     };
     var str = 'select * from a order by sex ASc, id DESC '
-    Executor.setLoader(function(ar, cb){
-      cb(null, rawData);
+    Executor.setLoader(function(ar, env, cb){
+      cb(null, rawData, ar);
     });
 
-    Executor.runSQL(str, function(err, dc){
+    var ast = Parser.parse(str);
+    Executor.runAST(ast, function(err, dc){
       if (err) {
         debug(err.stack);
       } else {
@@ -146,7 +169,9 @@ describe('executor test', function(){
 
   it('groupby filter test', function(){
     var rawData = { 
-      columns: [ 'id', 'sex' ],
+      columns: [ 
+        'id', 'sex'
+      ],
       data: [ 
         [ 3, 'a' ], 
         [ 4, 'f' ], 
@@ -160,12 +185,13 @@ describe('executor test', function(){
       ] 
     };
 
-    Executor.setLoader(function(ar, cb){
-      cb(null, rawData);
+    Executor.setLoader(function(ar, env, cb){
+      cb(null, rawData, ar);
     });
     var str = 'select id, sex from data group by id'
 
-    Executor.runSQL(str, function(err, dc){
+    var ast = Parser.parse(str);
+    Executor.runAST(ast, function(err, dc){
       if (err) {
         debug(err.stack);
       } else {
@@ -184,7 +210,8 @@ describe('executor test', function(){
 
     str = 'select id, count(id) from data group by id'
 
-    Executor.runSQL(str, function(err, dc){
+    ast = Parser.parse(str);
+    Executor.runAST(ast, function(err, dc){
       if (err) {
         debug(err.stack);
       } else {
@@ -205,7 +232,9 @@ describe('executor test', function(){
 
   it('groupby&orderby ', function(){
     var rawData = { 
-      columns: [ 'id', 'sex' ],
+      columns : [
+        'id', 'sex'
+      ],
       data: [ 
         [ 3, 'a' ], 
         [ 4, 'f' ], 
@@ -219,11 +248,13 @@ describe('executor test', function(){
       ] 
     };
 
-    Executor.setLoader(function(ar, cb){
-      cb(null, rawData);
+    Executor.setLoader(function(ar, env, cb){
+      cb(null, rawData, ar);
     });
     var str = 'select id, min(sex) as msex from data group by id order by count(id)'
-    Executor.runSQL(str, function(err, dc){
+
+    var ast = Parser.parse(str);
+    Executor.runAST(ast, function(err, dc){
       if (err) {
         debug(err.stack);
       } else {

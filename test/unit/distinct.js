@@ -7,7 +7,8 @@
 // +--------------------------------------------------------------------+
 
 var should      = require('should');
-var distinct    = require('../../lib/distinct');
+var distinct    = require('../../base/distinct');
+
 var AstReader   = require('../../lib/ast_helper').Reader;
 
 describe('disticnt test', function() {

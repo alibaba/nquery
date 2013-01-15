@@ -1,3 +1,9 @@
+// (C) 2011-2013 Alibaba Group Holding Limited.
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License 
+// version 2 as published by the Free Software Foundation. 
+
+// Author :windyrobin <windyrobin@Gmail.com>
 
 /**
  * @param {Object} dc like :{
@@ -35,9 +41,9 @@ function distinct(data){
 }
 
 function debug(str){
-  console.log(str);
+  //console.log(str);
 }
 
 function inspect(obj){
-  console.log(require('util').inspect(obj));
+  //console.log(require('util').inspect(obj));
 }

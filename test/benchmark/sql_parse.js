@@ -17,13 +17,13 @@ function test(fn, name) {
   var b = new Date();
   var res;
   for (var i = 0; i < NUM; i++) {
-    res = fn();  
+    ast = fn();  
   }
   var e = new Date();
   debug('-------------')
   debug('id : ' + name);
   debug('loop: ' + NUM + ', time: ' + (e-b));
-  debug(Adapter.toSQL(res.ast)); 
+  debug(Adapter.toSQL(ast)); 
   //inspect(res);
   debug('\n');
 }

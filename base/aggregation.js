@@ -1,7 +1,15 @@
-var Tool      = require('./tool');
-var AstHelper = require('./ast_helper');
+// (C) 2011-2013 Alibaba Group Holding Limited.
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License 
+// version 2 as published by the Free Software Foundation. 
 
-var runExpr         = AstHelper.run;
+// Author :windyrobin <windyrobin@Gmail.com>
+
+var Tool      = require('../lib/tool');
+var Engine    = require('../lib/engine');
+var AstHelper = require('../lib/ast_helper');
+
+var runExpr         = Engine.run;
 var getSelRefCols   = AstHelper.getSelRefCols;
 var getRefColInfo   = AstHelper.getRefColInfo;
 

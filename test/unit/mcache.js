@@ -1,5 +1,5 @@
 var should = require('should');
-var MCache = require('../../lib/mcache');
+var MCache = require('../../base/mcache');
 
 function inspect(obj) {
   console.log(require('util').inspect(obj, false, 10, true));  
