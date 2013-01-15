@@ -1,0 +1,34 @@
+{
+  "author": "windyrobin",
+  "name": "node-query",
+  "description": "general sql query interface for hybrid data sources",
+  "version": "0.1.7",
+  "repository": {
+    "url": "git://github.com/windyrobin/nquery.git"
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "engines": {
+    "node": ">=0.8.0"
+  },
+  "dependencies": {
+    "pegjs": ">=0.7.0"
+  },
+  "devDependencies": {
+    "mocha": ">=1.0.0"
+  },
+  "readmeFilename": "README.md",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [
+    "SQL",
+    "Engine",
+    "Hybird",
+    "Data",
+    "Source"
+  ],
+  "license": "BSD"
+}
