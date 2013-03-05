@@ -138,12 +138,17 @@
 }
 
 start 
-  = &init ast:(union_stmt  / update_stmt / replace_insert_stmt) {
+  = &init __ ast:(union_stmt  / update_stmt / replace_insert_stmt) {
       return {
         ast   : ast,
         param : params
       } 
     } 
+    /ast:proc_stmts {
+      return {
+        ast : ast  
+      }
+    }
 
 init  = { params = []; return true; }
 
@@ -233,12 +238,17 @@ table_join
       }
     } 
  
+//NOTE that ,the table assigned to `var` shouldn't write in `table_join`
 table_base 
-  =  t:table_name __ KW_AS? __ alias:ident? {
-      return  {
-        db    : t.db,
-        table : t.table,
-        as    : alias
+  = t:table_name __ KW_AS? __ alias:ident? {
+      if (t.type == 'var') {
+        return t;
+      } else {
+        return  {
+          db    : t.db,
+          table : t.table,
+          as    : alias
+        }
       }
     } 
 
@@ -258,6 +268,7 @@ table_name
       } 
       return obj;
     }
+    /var_decl
 
 on_clause 
   = KW_ON __ e:expr { return e; }
@@ -568,6 +579,7 @@ primary
       e.paren = true; 
       return e; 
     } 
+  / var_decl
 
 column_ref 
   = tbl:ident __ DOT __ col:column { 
@@ -855,6 +867,9 @@ STAR      = '*'
 LPAREN    = '('
 RPAREN    = ')'
 
+LBRAKE    = '['
+RBRAKE    = ']'
+
 __ =
   whitespace*
 
@@ -869,4 +884,114 @@ EOL
   
 EOF = !.
 
+//begin procedure extension
+proc_stmts 
+  = proc_stmt* 
 
+proc_stmt 
+  = __ s:(assign_stmt / return_stmt) {
+      return s;
+    }
+
+assign_stmt 
+  = va:var_decl __ KW_ASSIGN __ e:proc_expr {
+    return {
+      type : 'assign',
+      left : va,
+      right: e
+    }
+  }
+
+return_stmt 
+  = KW_RETURN __ e:proc_expr {
+  return {
+    type : 'return',
+    value: e
+  }
+}
+
+proc_expr 
+  = select_stmt
+  / proc_join
+  / proc_additive_expr
+  / proc_array
+
+proc_additive_expr
+  = head:proc_multiplicative_expr
+    tail:(__ additive_operator  __ proc_multiplicative_expr)* {
+      return createBinaryExprChain(head, tail);
+    }
+
+proc_multiplicative_expr
+  = head:proc_primary
+    tail:(__ multiplicative_operator  __ proc_primary)* {
+      return createBinaryExprChain(head, tail);
+    }
+
+proc_join
+  = lt:var_decl __ op:join_op  __ rt:var_decl __ expr:on_clause {
+      return {
+        type    : 'join',
+        ltable  : lt, 
+        rtable  : rt,
+        op      : op,
+        on      : expr
+      }
+    }
+
+proc_primary 
+  = literal
+  / var_decl
+  / proc_func_call 
+  / param
+  / LPAREN __ e:proc_additive_expr __ RPAREN { 
+      e.paren = true; 
+      return e; 
+    } 
+
+proc_func_call
+  = name:ident __ LPAREN __ l:proc_primary_list __ RPAREN {
+      return {
+        type : 'function',
+        name : name, 
+        args : l
+      }
+    }
+
+proc_primary_list 
+  = head:proc_primary tail:(__ COMMA __ proc_primary)* {
+      return createList(head, tail);
+    } 
+
+proc_array = 
+  LBRAKE __ l:proc_primary_list __ RBRAKE {
+    return {
+      type : 'array',
+      value : l
+    }
+  }
+
+
+var_decl 
+  = KW_VAR_PRE name:ident_name m:mem_chain {
+    return {
+      type : 'var',
+      name : name,
+      members : m
+    }
+  } 
+
+mem_chain 
+  = l:('.' ident_name)* {
+    var s = [];
+    for (var i = 0; i < l.length; i++) {
+      s.push(l[i][1]); 
+    }
+    return s;
+  }
+
+ KW_VAR_PRE = '$'
+
+ KW_RETURN = 'return'i
+
+ KW_ASSIGN = ':='
