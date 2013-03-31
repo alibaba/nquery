@@ -5,9 +5,11 @@
 
 // Author :windyrobin <windyrobin@Gmail.com>
 
-var Adapter   = require(__dirname + '/../lib/adapter');
-var Context   = require(__dirname + '/../lib/context');
-var Extractor = require(__dirname + '/../lib/extractor');
+var nQuery    = require('../index')
+
+var Adapter   = nQuery.Adapter;
+var Context   = nQuery.Context;
+var Extractor = nQuery.Extractor;
 
 var kvInfo = {};
 var dbInfo = {};
