@@ -3,7 +3,8 @@ var should = require('should');
 var Parser = require('../../lib/parser');
 var AstHelper = require('../../lib/ast_helper');
 var createBinaryExpr = AstHelper.createBinaryExpr;
-var filter = require('../../lib/aggregation');
+
+var filter = require('../../base/aggregation');
 
 var AstReader = AstHelper.Reader;
 
@@ -15,9 +16,9 @@ describe('aggregation test', function(){
   it('basic test', function(){
     var rawData = { 
       columns: [
-        ['a.id', 'b.id'],
-        ['a.name'],
-        ['b.type']
+        [{table : 'a', column : 'id'}, {table : 'b', column : 'id'}],
+        [{table : 'a', column : 'name'}],
+        [{table : 'b', column : 'type'}]
       ],
       data: [ 
         [ 1, 'a', 't1' ], 

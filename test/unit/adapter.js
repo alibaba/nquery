@@ -1,7 +1,8 @@
 
 var should  = require('should');
 var Adapter = require('../../lib/adapter');
-var Parser = require('../../lib/parser');
+var Parser  = require('../../lib/parser');
+var Context = require('../../lib/context');
 
 function debug(str) {
   console.log(str);  
@@ -97,6 +98,23 @@ describe('sql adapter test',function(){
     //inspect(ast);
 
     estr.should.eql('SELECT (1 > 1 AND 0 > 0 OR NOT TRUE)');
+  });
+
+
+  it('procedure test', function() {
+    var sql, ast;
+
+    sql = "SELECT * from t where id = $id or id NOT CONTAINS $tid";
+    ast = Parser.parse(sql);
+
+    Context.setctx({
+      id : [1, 2, 'a'], 
+      tid : ['b', 'c'], 
+    })
+    var estr = Adapter.toSQL(ast);
+    //inspect(estr);
+    //inspect(ast);
+    estr.should.eql("SELECT * FROM t WHERE id IN (1, 2, 'a') OR id NOT CONTAINS ('b', 'c')");
   });
 
   it('clause test', function() {

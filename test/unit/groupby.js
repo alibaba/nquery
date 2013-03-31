@@ -1,5 +1,5 @@
 var should  = require('should');
-var doGroupby = require('../../lib/groupby');
+var doGroupby = require('../../base/groupby');
 
 function inspect(obj){
   console.log(require('util').inspect(obj, false, 10));
@@ -9,9 +9,9 @@ describe('data filter test', function(){
 
   var rawData = { 
     columns: [
-      ['a.id', 'b.id'],
-      ['a.name'],
-      ['b.type']
+      [{table : 'a', column : 'id'}, {table : 'b', column : 'id'}],
+      [{table : 'a', column : 'name'}],
+      [{table : 'b', column : 'type'}]
     ],
     data: [ 
       [ 1, 'a', 't1' ], 
@@ -25,13 +25,13 @@ describe('data filter test', function(){
   };
 
   it('groupb data test', function(){
-    var gbArr = ['a.name', 'b.id'];
+    var gbArr = [{table : 'a', column : 'name'}, {table : 'b', column : 'id'}];
     var eData = {
       'string_a__number_1' : {
         columns: [
-          ['a.id', 'b.id'],
-          ['a.name'],
-          ['b.type']
+          [{table : 'a', column : 'id'}, {table : 'b', column : 'id'}],
+          [{table : 'a', column : 'name'}],
+          [{table : 'b', column : 'type'}]
         ],
         data: [ 
           [ 1, 'a', 't1' ] 
@@ -39,9 +39,9 @@ describe('data filter test', function(){
       },
       'string_b__number_2' : {
         columns: [
-          ['a.id', 'b.id'],
-          ['a.name'],
-          ['b.type']
+          [{table : 'a', column : 'id'}, {table : 'b', column : 'id'}],
+          [{table : 'a', column : 'name'}],
+          [{table : 'b', column : 'type'}]
         ],
         data: [ 
           [ 2, 'b', 't2' ], 
@@ -50,9 +50,9 @@ describe('data filter test', function(){
       },
       'string_c__number_3' : {
         columns: [
-          ['a.id', 'b.id'],
-          ['a.name'],
-          ['b.type']
+          [{table : 'a', column : 'id'}, {table : 'b', column : 'id'}],
+          [{table : 'a', column : 'name'}],
+          [{table : 'b', column : 'type'}]
         ],
         data: [ 
           [ 3, 'c', 't3' ], 
@@ -61,9 +61,9 @@ describe('data filter test', function(){
       },
       'string_b__number_5' : {
         columns: [
-          ['a.id', 'b.id'],
-          ['a.name'],
-          ['b.type']
+          [{table : 'a', column : 'id'}, {table : 'b', column : 'id'}],
+          [{table : 'a', column : 'name'}],
+          [{table : 'b', column : 'type'}]
         ],
         data: [ 
           [ 5, 'b', 't3' ], 
@@ -71,9 +71,9 @@ describe('data filter test', function(){
       },
       'string_b__number_6' : {
         columns: [
-          ['a.id', 'b.id'],
-          ['a.name'],
-          ['b.type']
+          [{table : 'a', column : 'id'}, {table : 'b', column : 'id'}],
+          [{table : 'a', column : 'name'}],
+          [{table : 'b', column : 'type'}]
         ],
         data: [ 
           [ 6, 'b', 't4' ] 

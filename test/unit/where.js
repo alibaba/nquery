@@ -3,7 +3,8 @@ var should = require('should');
 var Parser = require('../../lib/parser');
 var AstHelper = require('../../lib/ast_helper');
 var createBinaryExpr = AstHelper.createBinaryExpr;
-var filter = require('../../lib/where');
+
+var filter = require('../../base/where');
 
 function inspect(obj) {
   console.log(require('util').inspect(obj, false, 10, true));  
@@ -13,9 +14,9 @@ describe('where filter test', function(){
   it('column eql test', function(){
     var rawData = { 
       columns: [
-        ['a.id', 'b.id'],
-        ['a.name'],
-        ['b.type']
+        [{table : 'a', column : 'id'}, {table : 'b', column : 'id'}],
+        [{table : 'a', column : 'name'}],
+        [{table : 'b', column : 'type'}]
       ],
       data: [ 
         [ 1, 'a', 't1' ], 
@@ -27,7 +28,7 @@ describe('where filter test', function(){
         [ 6, 'b', 't4' ] 
       ] 
     };
-    var e = createBinaryExpr('=', {type : 'column_ref', column : 'a.id'}, 3);
+    var e = createBinaryExpr('=', {type : 'column_ref', column : 'id'}, 3);
     //sm.where('a.id',WHERE.EQ, 3);
     //inspect(e);
     var res = filter(rawData, e); 
@@ -40,21 +41,21 @@ describe('where filter test', function(){
   it('error ', function(){
     var rawData = { 
       columns: [
-        ['a.id', 'b.id'],
-        ['a.name'],
-        ['b.type']
+        [{table : 'a', column : 'id'}, {table : 'b', column : 'id'}],
+        [{table : 'a', column : 'name'}],
+        [{table : 'b', column : 'type'}]
       ],
       data: [ 
         [ 1, 'a', 't1' ] 
       ]
     };
-    var e = createBinaryExpr('=', {type : 'column_ref', column : 'id'}, 3);
+    var e = createBinaryExpr('=', {type : 'column_ref', column : 'nid'}, 3);
     //sm.where('a.id',WHERE.EQ, 3);
     //inspect(e);
     try{
       var res = filter(rawData, e); 
     }catch(e) {
-      e.message.should.include('no column found for :id');    
+      e.message.should.include('no column found for :nid');    
     }
     should.not.exist(res);
   });
@@ -62,9 +63,9 @@ describe('where filter test', function(){
   it('all scan ', function(){
     var rawData = { 
       columns: [
-        ['a.id', 'b.id'],
-        ['a.name'],
-        ['b.type']
+        [{table : 'a', column : 'id'}, {table : 'b', column : 'id'}],
+        [{table : 'a', column : 'name'}],
+        [{table : 'b', column : 'type'}]
       ],
       data: [ 
         [ 1, 'a', 't1' ], 

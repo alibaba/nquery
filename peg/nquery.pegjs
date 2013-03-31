@@ -142,6 +142,9 @@
 
   //used for store refered parmas
   var params = [];
+
+  //used for dependency analysis
+  var varList = [];
 }
 
 start 
@@ -236,6 +239,10 @@ table_ref
   
 table_join 
   = op:join_op __ t:table_base __ expr:on_clause? {
+    t.join = op;
+    t.on   = expr;
+    return t;
+    /*
       return  {
         db    : t.db,
         table : t.table,
@@ -243,12 +250,14 @@ table_join
         join  : op,
         on    : expr
       }
+    */
     } 
  
 //NOTE that ,the table assigned to `var` shouldn't write in `table_join`
 table_base 
   = t:table_name __ KW_AS? __ alias:ident? {
       if (t.type == 'var') {
+        t.as = alias;
         return t;
       } else {
         return  {
@@ -275,7 +284,11 @@ table_name
       } 
       return obj;
     }
-    /var_decl
+    /v:var_decl {
+      v.db = '';
+      v.table = v.name;
+      return v;
+    }
 
 on_clause 
   = KW_ON __ e:expr { return e; }
@@ -549,12 +562,24 @@ in_op_right
         right : l
       }
     }
+  / op:in_op __ e:var_decl {
+      return {
+        op    : op,  
+        right : e
+      }
+    }
 
 contains_op_right
   = op:contains_op __ LPAREN  __ l:expr_list __ RPAREN {
       return {
         op    : op,  
         right : l
+      }
+    }
+  / op:contains_op __ e:var_decl {
+      return {
+        op    : op,  
+        right : e
       }
     }
 
@@ -896,9 +921,14 @@ proc_stmts
   = proc_stmt* 
 
 proc_stmt 
-  = __ s:(assign_stmt / return_stmt) {
-      return s;
+  = &proc_init __ s:(assign_stmt / return_stmt) {
+      return {
+        stmt : s,
+        vars: varList
+      }
     }
+
+proc_init  = { varList = []; return true; }
 
 assign_stmt 
   = va:var_decl __ KW_ASSIGN __ e:proc_expr {
@@ -913,14 +943,14 @@ return_stmt
   = KW_RETURN __ e:proc_expr {
   return {
     type : 'return',
-    value: e
+    expr: e
   }
 }
 
 proc_expr 
-  = select_stmt
-  / proc_join
-  / proc_additive_expr
+  = select_stmt 
+  / proc_join 
+  / proc_additive_expr 
   / proc_array
 
 proc_additive_expr
@@ -958,10 +988,14 @@ proc_primary
 
 proc_func_call
   = name:ident __ LPAREN __ l:proc_primary_list __ RPAREN {
+      //compatible with original func_call
       return {
         type : 'function',
         name : name, 
-        args : l
+        args : {
+          type  : 'expr_list',
+          value : l
+        }
       }
     }
 
@@ -981,6 +1015,8 @@ proc_array =
 
 var_decl 
   = KW_VAR_PRE name:ident_name m:mem_chain {
+    //push for analysis
+    varList.push(name);
     return {
       type : 'var',
       name : name,

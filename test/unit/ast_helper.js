@@ -1,10 +1,11 @@
 var should = require('should');
 
 var Parser = require('../../lib/parser');
+var Engine = require('../../lib/engine');
 var AstHelper = require('../../lib/ast_helper');
 
+var runExpr = Engine.run;
 var createBinaryExpr = AstHelper.createBinaryExpr;
-var runExpr = AstHelper.run;
 
 function inspect(obj) {
   //console.log(require('util').inspect(obj, false, 10, true));  

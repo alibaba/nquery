@@ -1,6 +1,6 @@
 
 var should = require('should');
-var doLimitFilter = require('../../lib/limit');
+var doLimitFilter = require('../../base/limit');
 
 function inspect(obj) {
   console.log(require('util').inspect(obj, false, 10, true));  

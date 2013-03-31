@@ -6,7 +6,7 @@
 // Author :windyrobin <windyrobin@Gmail.com>
 
 function debug(str){
-  console.log(str);  
+  //console.log(str);  
 }
 
 module.exports = Cache;
