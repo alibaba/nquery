@@ -5,14 +5,14 @@
 
 // Author :windyrobin <windyrobin@Gmail.com>
 
-var KV      = require('./kv');
-var Mysql   = require('./mysql');
+var KV        = require('./kv');
+var Mysql     = require('./mysql');
+var Loader    = require('./loader');
 
-var Loader    = require(__dirname + '/loader');
-
-var Query     = require(__dirname + '/../lib/query');
-var Context   = require(__dirname + '/../lib/context');
-var Executor  = require(__dirname + '/../lib/executor');
+var nQuery    = require('../index');
+var Query     = nQuery.Query;
+var Context   = nQuery.Context;
+var Executor  = nQuery.Executor;
 
 function debug(str) {
   console.log(str);  
@@ -64,10 +64,10 @@ function main() {
 
   var sequentialJoinSQL = [
     "$a := select * from kv.user where id BETWEEN '03' and '10'",
-    //you could also use `unique` first
-    "$type := UNIQUE($a.type)",
-    "$b := select * from mysql.shop where type = $type",
-    //"$b := select * from mysql.shop where type in $a.type",
+    //you could also use `unique` do filter firstly
+    //"$type := UNIQUE($a.type)",
+    //"$b := select * from mysql.shop where type = $type",
+    "$b := select * from mysql.shop where type in $a.type",
     "$c := select a.type , a.id ,b.name, b.title from $a INNER JOIN $b ON a.type = b.type WHERE a.id > '04'",
     "return [$b, $c]"
   ]

@@ -5,9 +5,13 @@
 
 // Author :windyrobin <windyrobin@Gmail.com>
 
-var Parser    = require(__dirname + '/../lib/parser');
-var Executor  = require(__dirname + '/../lib/executor');
-var AstReader = require(__dirname + '/../lib/ast_helper').Reader;
+var nQuery    = require('../index');
+
+var Query     = nQuery.Query;
+var Parser    = nQuery.Parser;
+var Context   = nQuery.Context;
+var Executor  = nQuery.Executor;
+var AstReader = nQuery.AstReader;
 
 var dc = {
   columns :  [
