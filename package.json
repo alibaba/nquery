@@ -13,11 +13,11 @@
     "node": ">=0.8.0"
   },
   "dependencies": {
+  },
+  "devDependencies": {
     "pegjs": ">=0.7.0",
     "mocha": ">=1.0.0",
     "should":">=1.2.0" 
-  },
-  "devDependencies": {
   },
   "readmeFilename": "README.md",
   "main": "index.js",
@@ -31,5 +31,5 @@
     "Data",
     "Source"
   ],
-  "license": "BSD"
+  "license": "GPLv2"
 }
