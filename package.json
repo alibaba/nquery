@@ -14,10 +14,10 @@
   },
   "dependencies": {
     "pegjs": ">=0.7.0"
-  },
-  "devDependencies": {
     "mocha": ">=1.0.0",
     "should":">=1.2.0" 
+  },
+  "devDependencies": {
   },
   "readmeFilename": "README.md",
   "main": "index.js",
