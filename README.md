@@ -44,7 +44,7 @@ for an KV Strorage engine ,what you need to do is providing the query interfaces
 
 for an SQL Strorage engine, you should realize a method like : 
 
-  ```
+  ```js
     function query(str, function(err, data) {
       ...  
     })
@@ -52,7 +52,7 @@ for an SQL Strorage engine, you should realize a method like :
 
 then you could write SQL like that : (code snippet  from `demo.js`)
 
-```
+```js
   var sqls = [
     "SELECT * FROM kv.user WHERE id IN ('01', '03')",
     "SELECT * FROM kv.user WHERE id LIKE '1%'",
