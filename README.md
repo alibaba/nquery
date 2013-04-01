@@ -1,4 +1,4 @@
-![nQuery](http://nquery.org/images/robin.jpg)
+![nQuery\includegraphics[height=2in]](http://nquery.org/images/robin.jpg)
 
 ==nQuery
 
