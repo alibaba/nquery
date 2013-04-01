@@ -14,9 +14,9 @@ npm install node-query
 
 it could be used in some typical scenarios: 
   * As a SQL frontend, do syntax checking and formating.
-  * As a SQL engine for your KV databass like hbase or anything like that.
+  * As a SQL engine for your KV databases like hbase or anything like that.
   * Providing a SQL interface for your HTTP/WEB service.
-  * Do data merging and intergration among many differecnt datasources like Oracle, MySQL, HBase etc. 
+  * Do data merging and intergration among many differecnt data sources like Oracle, MySQL, HBase etc. 
 
 
 ##  Demo & Test
@@ -39,13 +39,13 @@ there are also many test cases in `test/unit`, they would be great heleful to yo
 
 please read the demo files `demo/demo.js`
 
-for a KV Strorage engine ,what you need to do is providing the query interfaces like:
+for a KV storage engine ,what you need to do is providing the query interfaces like:
 
   * `singleQuery`, 
   * `rangeQuery`, 
   * `likeQuery`
 
-for a SQL Strorage engine, you should realize a function like : 
+for a SQL storage engine, you should realize a function like : 
 
 ```js
 function query(str, function(err, data) {
@@ -82,7 +82,7 @@ var sequentialJoinSQL = [
 ```
 
 As you see ,besides as a SQL computation level built on top of KV storage engine, it could do
-join operation among kv data-source, sql sources, HTTP services now
+join operation among kv data source, sql sources, HTTP services now
 
 ## nSQL Definition
 
