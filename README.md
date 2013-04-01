@@ -19,17 +19,17 @@ it could be used in some typical scenarios:
   * Do data merging and intergration among many differecnt datasources like Oracle, MySQL, HBase etc. 
 
 
-## Test & Demo
-
-for the test , type the command:
-
-  ```
-  make
-  ```
+##  Demo &Test
 to run the demo, type the command:
 
   ```
   node demo/demo.js
+  ```
+for the test , type the command:
+  (maybe you should run `npm install --dev` first, for in default the packages mocha/should are devDependencies)
+
+  ```
+  make
   ```
 
 read the demo carefully and then you could write own loader/adapter, 
