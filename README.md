@@ -19,12 +19,12 @@ it could be used in some typical scenarios:
 
 ## Test & Demo
 
-for test , type the command:
+for the test , type the command:
 
   ```
   make
   ```
-to run demo, type the command:
+to run the demo, type the command:
 
   ```
     node demo/demo.js
@@ -44,7 +44,7 @@ for a KV Strorage engine ,what you need to do is providing the query interfaces 
   * `rangeQuery`, 
   * `likeQuery`
 
-for a SQL Strorage engine, you should realize a method like : 
+for a SQL Strorage engine, you should realize a function like : 
 
   ```js
     function query(str, function(err, data) {
@@ -52,7 +52,7 @@ for a SQL Strorage engine, you should realize a method like :
     })
   ```
 
-then you could write SQL like that : (code snippet  from `demo.js`)
+then you could execute SQL like that : (code snippet  from `demo.js`)
 
 ```js
   var sqls = [
@@ -85,10 +85,10 @@ join operation among kv data-source, sql sources, HTTP services now
 
 ## nSQL Definition
 
-The 'a little strange' sql you see above, nSQL realize a subset of SQL92, and it 
+The 'a little strange' sql as you see above, nSQL realize a subset of SQL92, and it 
 also has some procedure features, it supports variables,  it addes types of `var` 
 / `array` / `table`, and also keyword `return`,  for the details, please see the 
-specificationthe `peg/nquery.pgejs`.  
+specification of `peg/nquery.pgejs`.  
 
 
 ## Task Scheduling
@@ -103,7 +103,7 @@ In traditional SQL, the query result is a 2-D table , but In nSQL ,we add types 
 / `table`,so now you could return complicated results like 
 
 ```
-  return [$b, $c, 'hello', [1, 2]];
+  return [$b, $c, 'hello', [1, 2]]
 ```
 
 
