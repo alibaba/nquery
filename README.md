@@ -80,13 +80,13 @@ then you could write SQL like that : (code snippet  from `demo.js`)
   ]
 ```
 
-As you see ,besides as a SQL computation level built on top of KV storage engine,  
-it could do join operation among kv data-source, sql sources, HTTP services now
+As you see ,besides as a SQL computation level built on top of KV storage engine, it could do
+join operation among kv data-source, sql sources, HTTP services now
 
 ## nSQL Definition
 
-The 'a little strange' sql you see above, nSQL realized a subset of SQL92, and it 
-also have some procedure features, it supports variables,  it addes type of `var` 
+The 'a little strange' sql you see above, nSQL realize a subset of SQL92, and it 
+also has some procedure features, it supports variables,  it addes types of `var` 
 / `array` / `table`, and also keyword `return`,  for the details, please see the 
 specificationthe `peg/nquery.pgejs`.  
 
@@ -94,9 +94,8 @@ specificationthe `peg/nquery.pgejs`.
 ## Task Scheduling
 
 As you could see in `concurrentJoinSQL` ,we know that the tasks `$a`, `$b` have no 
-relations, so nQuery would do them concurrently,  but for the procedure of
-`sequentialJoinSQL`,  `$b` is depending on `$a`,so task `$b` would be executed after
-the time `$a` completed 
+relations, so nQuery would do them concurrently,  but for the procedure of `sequentialJoinSQL`,
+`$b` is depending on `$a`,so task `$b` would be executed after the time `$a` completed 
 
 ## KeyWord `return` 
 
