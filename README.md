@@ -39,9 +39,12 @@ there are also many test cases in `test/unit`, they would be great heleful to yo
 you could see the demo files `demo/demo.js`
 
 for an KV Strorage engine ,what you need to do is providing the query interfaces like:
+
+  ```
   * `singleQuery`, 
   * `rangeQuery`, 
   * `likeQuery`
+  ```
 
 for an SQL Strorage engine, you should realize a method like : 
 
