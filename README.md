@@ -4,6 +4,8 @@ Generecic SQL engine for Web and Big-data.
 
 ## Install
 
+NodeJS Version 0.8.0+
+
 ```
 npm install node-query
 ```
