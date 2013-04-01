@@ -29,7 +29,7 @@ for the test , type the command:
 to run the demo, type the command:
 
   ```
-    node demo/demo.js
+  node demo/demo.js
   ```
 
 read the demo carefully and then you could write own loader/adapter, 
