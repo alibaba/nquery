@@ -26,7 +26,6 @@ to run the demo, type the command:
   node demo/demo.js
   ```
 for the test , type the command:
-  (maybe you should run `npm install --dev` first, for in default the packages mocha/should are devDependencies)
 
   ```
   make
