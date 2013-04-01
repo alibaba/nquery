@@ -1,6 +1,6 @@
 ## ![logo](http://nquery.org/images/robin-small.jpg) nQuery  
 
-Generecic SQL engine for Web and Big-data.
+Generic SQL engine for Web and Big-data.
 
 ## Install
 
@@ -19,17 +19,17 @@ it could be used in some typical scenarios:
   * Do data merging and intergration among many differecnt datasources like Oracle, MySQL, HBase etc. 
 
 
-##  Demo &Test
+##  Demo & Test
 to run the demo, type the command:
 
-  ```
-  node demo/demo.js
-  ```
+```
+node demo/demo.js
+```
 for the test , type the command:
 
-  ```
-  make
-  ```
+```
+make
+```
 
 read the demo carefully and then you could write own loader/adapter, 
 there are also many test cases in `test/unit`, they would be great heleful to you.
@@ -47,38 +47,38 @@ for a KV Strorage engine ,what you need to do is providing the query interfaces 
 
 for a SQL Strorage engine, you should realize a function like : 
 
-  ```js
-    function query(str, function(err, data) {
-      ...  
-    })
-  ```
+```js
+function query(str, function(err, data) {
+  ...  
+})
+```
 
 then you could execute SQL like that : (code snippet  from `demo.js`)
 
 ```js
-  var sqls = [
-    "SELECT * FROM kv.user WHERE id IN ('01', '03')",
-    "SELECT * FROM kv.user WHERE id LIKE '1%'",
-    "SELECT type, MAX(age), COUNT(id) FROM kv.user WHERE id BETWEEN '03' AND '10' GROUP BY type ORDER BY MAX(age) DESC",
-    "SELECT * from mysql.shop where shop_id > 5"
-  ]
+var sqls = [
+  "SELECT * FROM kv.user WHERE id IN ('01', '03')",
+  "SELECT * FROM kv.user WHERE id LIKE '1%'",
+  "SELECT type, MAX(age), COUNT(id) FROM kv.user WHERE id BETWEEN '03' AND '10' GROUP BY type ORDER BY MAX(age) DESC",
+  "SELECT * from mysql.shop where shop_id > 5"
+]
 
-  var concurrentJoinSQL = [
-    "$a := select * from kv.user where id BETWEEN '03' and '10'",
-    "$b := select * from mysql.shop where shop_id > 5",
-    "$c := select a.type , a.id ,b.name, b.title from $a INNER JOIN $b ON a.type = b.type WHERE a.id > '04'",
-    "return $c"
-  ]
+var concurrentJoinSQL = [
+  "$a := select * from kv.user where id BETWEEN '03' and '10'",
+  "$b := select * from mysql.shop where shop_id > 5",
+  "$c := select a.type , a.id ,b.name, b.title from $a INNER JOIN $b ON a.type = b.type WHERE a.id > '04'",
+  "return $c"
+]
 
-  var sequentialJoinSQL = [
-    "$a := select * from kv.user where id BETWEEN '03' and '10'",
-    //you could also use `unique` do filter firstly
-    //"$type := UNIQUE($a.type)",
-    //"$b := select * from mysql.shop where type = $type",
-    "$b := select * from mysql.shop where type in $a.type",
-    "$c := select a.type , a.id ,b.name, b.title from $a INNER JOIN $b ON a.type = b.type WHERE a.id > '04'",
-    "return [$b, $c]"
-  ]
+var sequentialJoinSQL = [
+  "$a := select * from kv.user where id BETWEEN '03' and '10'",
+  //you could also use `unique` do filter firstly
+  //"$type := UNIQUE($a.type)",
+  //"$b := select * from mysql.shop where type = $type",
+  "$b := select * from mysql.shop where type in $a.type",
+  "$c := select a.type , a.id ,b.name, b.title from $a INNER JOIN $b ON a.type = b.type WHERE a.id > '04'",
+  "return [$b, $c]"
+]
 ```
 
 As you see ,besides as a SQL computation level built on top of KV storage engine, it could do
@@ -104,7 +104,7 @@ In traditional SQL, the query result is a 2-D table , but In nSQL ,we add types 
 / `table`,so now you could return complicated results like 
 
 ```
-  return [$b, $c, 'hello', [1, 2]]
+return [$b, $c, 'hello', [1, 2]]
 ```
 
 
