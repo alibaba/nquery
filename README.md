@@ -1,14 +1,14 @@
-== nQuery
+## nQuery
 
 Generecic SQL engine for Web and Big-data.
 
-== install
+## Install
 
 ```
 npm install node-query
 ```
 
-== Introduction
+## Introduction
 
 it could be used in some typical scenarios: 
   * As a sql Frontend , do syntax checking and formating.
@@ -17,7 +17,7 @@ it could be used in some typical scenarios:
   * Do data merging and intergration among many differecnt datasources like Oracle, MySQL, HBase etc. 
 
 
-== Test & Demo
+## Test & Demo
 
 for test , type the command:
 
@@ -34,7 +34,7 @@ read the demo carefully and then you could write own loader/adapter,
 there are also many test cases in `test/unit`, they would be great heleful to you.
 
 
-== Usage
+## Usage
 
 you could see the demo files `demo/demo.js`
 
@@ -83,7 +83,7 @@ As you see ,besides as a SQL computation level built on top of KV storage engine
 
 it could do join operation among kv data-source, sql sources, HTTP services now
 
-== nSQL Definition
+## nSQL Definition
 
 The 'a little strange' sql you see above, nSQL realized a subset of SQL92, 
 and it also have some procedure features, it supports variables, 
@@ -91,7 +91,7 @@ it addes type of `var` / `array` / `table`, and also keyword `return`,
 for the details, please see the specificationthe `peg/nquery.pgejs`. 
 
 
-== Task Scheduling
+## Task Scheduling
 
 As you could see in `concurrentJoinSQL` ,we know that the tasks `$a`, `$b` have no relations, 
 so nQuery would do them concurrently,  but for the procedure of `sequentialJoinSQL`,  
@@ -110,7 +110,7 @@ we add types of  `array` / `table`,so now you could return complicated results l
 Just Enjoy It!
 
 
-== Acknowledgements
+## Acknowledgements
 
 * PegJS     : http://pegjs.majda.cz/ 
 * NodeJS    : http://nodejs.org/ 
