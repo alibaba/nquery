@@ -36,15 +36,15 @@ there are also many test cases in `test/unit`, they would be great heleful to yo
 
 ## Usage
 
-you could see the demo files `demo/demo.js`
+please read the demo files `demo/demo.js`
 
-for an KV Strorage engine ,what you need to do is providing the query interfaces like:
+for a KV Strorage engine ,what you need to do is providing the query interfaces like:
 
   * `singleQuery`, 
   * `rangeQuery`, 
   * `likeQuery`
 
-for an SQL Strorage engine, you should realize a method like : 
+for a SQL Strorage engine, you should realize a method like : 
 
   ```js
     function query(str, function(err, data) {
@@ -80,27 +80,28 @@ then you could write SQL like that : (code snippet  from `demo.js`)
   ]
 ```
 
-As you see ,besides as a SQL computation level built on top of KV storage engine, 
+As you see ,besides as a SQL computation level built on top of KV storage engine,  
 it could do join operation among kv data-source, sql sources, HTTP services now
 
 ## nSQL Definition
 
-The 'a little strange' sql you see above, nSQL realized a subset of SQL92,  
-and it also have some procedure features, it supports variables,  
-it addes type of `var` / `array` / `table`, and also keyword `return`,  
-for the details, please see the specificationthe `peg/nquery.pgejs`.  
+The 'a little strange' sql you see above, nSQL realized a subset of SQL92, and it 
+also have some procedure features, it supports variables,  it addes type of `var`  
+/ `array` / `table`, and also keyword `return`,  for the details, please see the 
+specificationthe `peg/nquery.pgejs`.  
 
 
 ## Task Scheduling
 
-As you could see in `concurrentJoinSQL` ,we know that the tasks `$a`, `$b` have no relations,  
-so nQuery would do them concurrently,  but for the procedure of `sequentialJoinSQL`,  
-`$b` is depending on `$a`,so task `$b` would be executed after the time `$a` completed 
+As you could see in `concurrentJoinSQL` ,we know that the tasks `$a`, `$b` have no  
+relations, so nQuery would do them concurrently,  but for the procedure of  
+`sequentialJoinSQL`,  `$b` is depending on `$a`,so task `$b` would be executed after 
+the time `$a` completed 
 
 ## KeyWord `return` 
 
-In traditional SQL, the query result is a 2-D table , but In nSQL , 
-we add types of  `array` / `table`,so now you could return complicated results like 
+In traditional SQL, the query result is a 2-D table , but In nSQL ,we add types of  
+`array` / `table`,so now you could return complicated results like 
 
 ```
   return [$b, $c, 'hello', [1, 2]];
