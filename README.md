@@ -86,22 +86,22 @@ it could do join operation among kv data-source, sql sources, HTTP services now
 ## nSQL Definition
 
 The 'a little strange' sql you see above, nSQL realized a subset of SQL92, and it 
-also have some procedure features, it supports variables,  it addes type of `var`  
+also have some procedure features, it supports variables,  it addes type of `var` 
 / `array` / `table`, and also keyword `return`,  for the details, please see the 
 specificationthe `peg/nquery.pgejs`.  
 
 
 ## Task Scheduling
 
-As you could see in `concurrentJoinSQL` ,we know that the tasks `$a`, `$b` have no  
-relations, so nQuery would do them concurrently,  but for the procedure of  
-`sequentialJoinSQL`,  `$b` is depending on `$a`,so task `$b` would be executed after 
+As you could see in `concurrentJoinSQL` ,we know that the tasks `$a`, `$b` have no 
+relations, so nQuery would do them concurrently,  but for the procedure of
+`sequentialJoinSQL`,  `$b` is depending on `$a`,so task `$b` would be executed after
 the time `$a` completed 
 
 ## KeyWord `return` 
 
-In traditional SQL, the query result is a 2-D table , but In nSQL ,we add types of  
-`array` / `table`,so now you could return complicated results like 
+In traditional SQL, the query result is a 2-D table , but In nSQL ,we add types of  `array`
+/ `table`,so now you could return complicated results like 
 
 ```
   return [$b, $c, 'hello', [1, 2]];
