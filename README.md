@@ -1,3 +1,5 @@
+![nQuery](http://nquery.org/images/robin.jpg)
+
 ==nQuery
 
 Generecic SQL engine for Web and Big-data.
