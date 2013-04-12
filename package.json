@@ -1,6 +1,6 @@
 {
   "author": "windyrobin",
-  "name": "nquery-robin",
+  "name": "node-query",
   "description": "general sql query interface for hybrid data sources",
   "version": "0.3.1",
   "repository": {
