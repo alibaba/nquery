@@ -1,8 +1,8 @@
 {
   "author": "windyrobin",
-  "name": "node-query",
+  "name": "nquery-robin",
   "description": "general sql query interface for hybrid data sources",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "repository": {
     "url": "git://github.com/alibaba/nquery.git"
   },

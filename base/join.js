@@ -5,8 +5,6 @@
 
 // Author :windyrobin <windyrobin@Gmail.com>
 
-var Context  = require('./context');
-
 exports.leftJoin  = leftJoin;
 exports.innerJoin = innerJoin;
 
