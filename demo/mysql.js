@@ -7,9 +7,7 @@
 
 var nQuery    = require('../index');
 
-var Query     = nQuery.Query;
 var Parser    = nQuery.Parser;
-var Context   = nQuery.Context;
 var Executor  = nQuery.Executor;
 var AstReader = nQuery.AstReader;
 
