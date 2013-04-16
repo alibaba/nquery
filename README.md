@@ -14,9 +14,9 @@ npm install node-query
 
 it could be used in some typical scenarios: 
   * As a SQL frontend, do syntax checking and formating.
-  * As a SQL engine for your KV databases like hbase or anything like that.
+  * As a SQL engine for your KV databases like HBase or anything like that.
   * Providing a SQL interface for your HTTP/WEB service.
-  * Do data merging and intergration among many differecnt data sources like Oracle, MySQL, HBase etc. 
+  * Do data merging and intergration among many different data sources like Oracle, MySQL, HBase etc. 
 
 
 ##  Demo & Test
@@ -32,7 +32,7 @@ make
 ```
 
 read the demo carefully and then you could write own loader/adapter, 
-there are also many test cases in `test/unit`, they would be great heleful to you.
+there are also many test cases in `test/unit`, they would be great helpful to you.
 
 
 ## Usage
