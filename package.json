@@ -2,7 +2,7 @@
   "author": "windyrobin",
   "name": "node-query",
   "description": "general sql query interface for hybrid data sources",
-  "version": "0.3.0",
+  "version": "0.3.2",
   "repository": {
     "url": "git://github.com/alibaba/nquery.git"
   },

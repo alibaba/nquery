@@ -8,7 +8,7 @@
 // Author: fengyin <pengchun@taobao.com>
 
 var should  = require('should');
-var Join  = require(__dirname + '/../../lib/join');
+var Join  = require(__dirname + '/../../base/join');
 
 var ta, tb;
 

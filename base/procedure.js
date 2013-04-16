@@ -7,12 +7,11 @@
 
 var Jobs              = require('../lib/jobs');
 var Table             = require('../lib/table');
+var Merger            = require('../lib/merger');
 var Engine            = require('../lib/engine');
 var Context           = require('../lib/context');
 var Executor          = require('../lib/executor');
 var AstHelper         = require('../lib/ast_helper');
-
-var Merger            = require('./merger');
 
 var runAST            = Executor.runAST;
 var runPlain          = Engine.run;

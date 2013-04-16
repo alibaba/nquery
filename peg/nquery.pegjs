@@ -643,6 +643,9 @@ column =
   name:column_name !{ return reservedMap[name.toUpperCase()] === true; } {
     return name;  
   } 
+  /'`' chars:[^`]+ '`' {
+    return chars.join('');  
+  }
 
 column_name 
   =  start:ident_start parts:column_part* { return start + parts.join(''); }
