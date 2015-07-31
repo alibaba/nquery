@@ -180,7 +180,7 @@ describe('template test',function(){
     try{
       ast = Parser.tplParse(sql, {name : 'hello'});
     } catch(e) {
-      e.message.should.include('not instantiated :id');
+      e.message.should.containEql('not instantiated :id');
     }
   })
 

@@ -72,7 +72,7 @@ describe('column filter test', function(){
     try{
       var res = filter(rawData, e); 
     }catch(e) {
-      e.message.should.include('no column found for :id');    
+      e.message.should.containEql('no column found for :id');    
     }
     should.not.exist(res);
   });
