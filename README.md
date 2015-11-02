@@ -1,4 +1,4 @@
-## ![logo](http://nquery.org/images/robin-small.jpg) nQuery  
+## nQuery  
 
 Generic SQL engine for Web and Big-data.
 
