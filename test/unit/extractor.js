@@ -36,7 +36,7 @@ describe('extractor test',function(){
     try {
       info = Extractor.getKeyInfo(ast.where, options);
     } catch(e) {
-      e.message.should.include('primary keys not ful-filled');
+      e.message.should.containEql('primary keys not ful-filled');
     }
   });   
 

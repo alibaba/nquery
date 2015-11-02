@@ -20,8 +20,8 @@ describe('sql adapter test',function(){
     ast = Parser.parse(sql);
 
     var estr = Adapter.toSQL(ast);
-    estr.should.include('\\n');
-    estr.should.include('\\t');
+    estr.should.containEql('\\n');
+    estr.should.containEql('\\t');
     //inspect(estr);
   });
 

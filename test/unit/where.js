@@ -55,7 +55,7 @@ describe('where filter test', function(){
     try{
       var res = filter(rawData, e); 
     }catch(e) {
-      e.message.should.include('no column found for :nid');    
+      e.message.should.containEql('no column found for :nid');    
     }
     should.not.exist(res);
   });
