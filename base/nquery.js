@@ -1883,7 +1883,7 @@ module.exports = (function(){
         
         pos0 = pos;
         pos1 = pos;
-        result0 = parse_column_name();
+        result0 = parse_column();
         if (result0 !== null) {
           result1 = parse___();
           if (result1 !== null) {
@@ -2034,6 +2034,78 @@ module.exports = (function(){
         }
         if (result0 === null) {
           pos = pos0;
+        }
+        if (result0 === null) {
+          pos0 = pos;
+          pos1 = pos;
+          result0 = parse_replace_insert();
+          if (result0 !== null) {
+            result1 = parse___();
+            if (result1 !== null) {
+              result2 = parse_KW_INTO();
+              if (result2 !== null) {
+                result3 = parse___();
+                if (result3 !== null) {
+                  result4 = parse_table_name();
+                  if (result4 !== null) {
+                    result5 = parse___();
+                    if (result5 !== null) {
+                      result6 = parse_KW_SET();
+                      if (result6 !== null) {
+                        result7 = parse___();
+                        if (result7 !== null) {
+                          result8 = parse_set_list();
+                          if (result8 !== null) {
+                            result0 = [result0, result1, result2, result3, result4, result5, result6, result7, result8];
+                          } else {
+                            result0 = null;
+                            pos = pos1;
+                          }
+                        } else {
+                          result0 = null;
+                          pos = pos1;
+                        }
+                      } else {
+                        result0 = null;
+                        pos = pos1;
+                      }
+                    } else {
+                      result0 = null;
+                      pos = pos1;
+                    }
+                  } else {
+                    result0 = null;
+                    pos = pos1;
+                  }
+                } else {
+                  result0 = null;
+                  pos = pos1;
+                }
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+          if (result0 !== null) {
+            result0 = (function(offset, ri, t, l) {
+                return {
+                  type  : ri,
+                  db    : t.db,
+                  table : t.table,
+                  set   : l
+                }
+              })(pos0, result0[0], result0[4], result0[8]);
+          }
+          if (result0 === null) {
+            pos = pos0;
+          }
         }
         return result0;
       }
@@ -3611,7 +3683,7 @@ module.exports = (function(){
           pos = pos1;
         }
         if (result0 !== null) {
-          result0 = (function(offset, tbl, col) { 
+          result0 = (function(offset, tbl, col) {
               return {
                 type  : 'column_ref',
                 table : tbl, 
@@ -3626,7 +3698,7 @@ module.exports = (function(){
           pos0 = pos;
           result0 = parse_column();
           if (result0 !== null) {
-            result0 = (function(offset, col) { 
+            result0 = (function(offset, col) {
                 return {
                   type  : 'column_ref',
                   table : '', 
@@ -3727,42 +3799,12 @@ module.exports = (function(){
       }
       
       function parse_ident() {
-        var result0, result1;
-        var pos0, pos1;
-        
-        pos0 = pos;
-        pos1 = pos;
-        result0 = parse_ident_name();
-        if (result0 !== null) {
-          result1 = (function(offset, name) { return reservedMap[name.toUpperCase()] === true; })(pos, result0) ? null : "";
-          if (result1 !== null) {
-            result0 = [result0, result1];
-          } else {
-            result0 = null;
-            pos = pos1;
-          }
-        } else {
-          result0 = null;
-          pos = pos1;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, name) {
-            return name;  
-          })(pos0, result0[0]);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_column() {
         var result0, result1, result2;
         var pos0, pos1;
         
         pos0 = pos;
         pos1 = pos;
-        result0 = parse_column_name();
+        result0 = parse_ident_name();
         if (result0 !== null) {
           result1 = (function(offset, name) { return reservedMap[name.toUpperCase()] === true; })(pos, result0) ? null : "";
           if (result1 !== null) {
@@ -3848,7 +3890,109 @@ module.exports = (function(){
           }
           if (result0 !== null) {
             result0 = (function(offset, chars) {
-              return chars.join('');  
+              return chars.join('');
+            })(pos0, result0[1]);
+          }
+          if (result0 === null) {
+            pos = pos0;
+          }
+        }
+        return result0;
+      }
+      
+      function parse_column() {
+        var result0, result1, result2;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse_column_name();
+        if (result0 !== null) {
+          result1 = (function(offset, name) { return reservedMap[name.toUpperCase()] === true; })(pos, result0) ? null : "";
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, name) {
+            return name;
+          })(pos0, result0[0]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        if (result0 === null) {
+          pos0 = pos;
+          pos1 = pos;
+          if (input.charCodeAt(pos) === 96) {
+            result0 = "`";
+            pos++;
+          } else {
+            result0 = null;
+            if (reportFailures === 0) {
+              matchFailed("\"`\"");
+            }
+          }
+          if (result0 !== null) {
+            if (/^[^`]/.test(input.charAt(pos))) {
+              result2 = input.charAt(pos);
+              pos++;
+            } else {
+              result2 = null;
+              if (reportFailures === 0) {
+                matchFailed("[^`]");
+              }
+            }
+            if (result2 !== null) {
+              result1 = [];
+              while (result2 !== null) {
+                result1.push(result2);
+                if (/^[^`]/.test(input.charAt(pos))) {
+                  result2 = input.charAt(pos);
+                  pos++;
+                } else {
+                  result2 = null;
+                  if (reportFailures === 0) {
+                    matchFailed("[^`]");
+                  }
+                }
+              }
+            } else {
+              result1 = null;
+            }
+            if (result1 !== null) {
+              if (input.charCodeAt(pos) === 96) {
+                result2 = "`";
+                pos++;
+              } else {
+                result2 = null;
+                if (reportFailures === 0) {
+                  matchFailed("\"`\"");
+                }
+              }
+              if (result2 !== null) {
+                result0 = [result0, result1, result2];
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+          if (result0 !== null) {
+            result0 = (function(offset, chars) {
+              return chars.join('');
             })(pos0, result0[1]);
           }
           if (result0 === null) {

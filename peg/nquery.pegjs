@@ -266,7 +266,7 @@ table_base
           as    : alias
         }
       }
-    } 
+    }
 
 join_op
   = KW_LEFT __ KW_JOIN { return 'LEFT JOIN'; } 
@@ -371,7 +371,7 @@ set_list
  * 'col1 = (col2 > 3)'
  */
 set_item
-  = c:column_name __ '=' __ v:additive_expr {
+  = c:column __ '=' __ v:additive_expr {
       return {
         column: c,
         value : v
@@ -381,7 +381,7 @@ set_item
 replace_insert_stmt
   = ri:replace_insert       __ 
     KW_INTO                 __ 
-    t:table_name  __ LPAREN __ 
+    t:table_name  __ LPAREN __
     c:column_list  __ RPAREN __
     v:value_clause             {
       return {
@@ -391,6 +391,18 @@ replace_insert_stmt
         columns   : c,
         values    : v
       }  
+    }
+  / ri:replace_insert       __
+    KW_INTO                 __
+    t:table_name            __
+    KW_SET                  __
+    l:set_list {
+      return {
+        type  : ri,
+        db    : t.db,
+        table : t.table,
+        set   : l
+      }
     }
 
 replace_insert
@@ -614,14 +626,14 @@ primary
   / var_decl
 
 column_ref 
-  = tbl:ident __ DOT __ col:column { 
+  = tbl:ident __ DOT __ col:column {
       return {
         type  : 'column_ref',
         table : tbl, 
         column : col
       }; 
     } 
-  / col:column { 
+  / col:column {
       return {
         type  : 'column_ref',
         table : '', 
@@ -637,14 +649,17 @@ column_list
 ident = 
   name:ident_name !{ return reservedMap[name.toUpperCase()] === true; } {
     return name;  
-  } 
+  }
+  / '`' chars:[^`]+ '`' {
+    return chars.join('');
+  }
 
 column = 
   name:column_name !{ return reservedMap[name.toUpperCase()] === true; } {
-    return name;  
-  } 
-  /'`' chars:[^`]+ '`' {
-    return chars.join('');  
+    return name;
+  }
+  / '`' chars:[^`]+ '`' {
+    return chars.join('');
   }
 
 column_name 
