@@ -256,12 +256,20 @@ describe('select test',function(){
   });
 
   it('keyword as table test', function() {
-    var sql, ast;
-    sql = 'select * from service_a.table as sa inner join service_b.table as sb on sa.id=sb.id where sa.fm=f and sb.id=3'
+    var sql, ast, rmTable = Parser.reservedMap.TABLE, e = {};
+    Parser.reservedMap.TABLE = false;
 
+    sql = 'select * from service_a.table as sa inner join service_b.table as sb on sa.id=sb.id where sa.fm=f and sb.id=3';
     ast = Parser.parse(sql);
-    //inspect(ast);
-    //ast.from.should.eql([});   
+    Parser.reservedMap.TABLE = rmTable;
+
+    try {
+      Parser.parse(sql);
+    } catch (_e) {
+      e = _e;
+    }
+
+    (e.constructor === Error).should.eql(true);
   });
 
 })
