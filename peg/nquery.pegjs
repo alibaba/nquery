@@ -7,6 +7,7 @@
 
 {
   var util = require('util');
+  var reservedMap = module.exports.reservedMap || {};
 
   function debug(str){
     console.log(str);
@@ -66,53 +67,6 @@
     return result;
   }
 
-  var reservedMap = {
-    'SHOW'    : true,
-    'DROP'    : true,
-    'SELECT'  : true,
-    'UPDATE'  : true,
-    'CREATE'  : true,
-    'DELETE'  : true,
-    'INSERT'  : true,
-    'REPLACE' : true,
-    'EXPLAIN' : true,
-    'ALL'     : true,
-    'DISTINCT': true,
-    'AS'      : true,
-    'TABLE'   : true,
-    'INTO'    : true,
-    'FROM'    : true,
-    'SET'     : true,
-    'LEFT'    : true,
-    'ON'      : true,
-    'INNER'   : true, 
-    'JOIN'    : true, 
-    'UNION'   : true, 
-    'VALUES'  : true, 
-    'EXISTS'  : true, 
-    'WHERE'   : true,
-    'GROUP'   : true,
-    'BY'      : true,
-    'HAVING'  : true,
-    'ORDER'   : true,
-    'ASC'     : true,
-    'DESC'    : true,
-    'LIMIT'   : true,
-    'BETWEEN' : true, 
-    'IN'      : true,
-    'IS'      : true,
-    'LIKE'    : true,
-    'CONTAINS': true,
-    'NOT'     : true,
-    'AND'     : true, 
-    'OR'      : true,
-
-    //literal
-    'TRUE'    : true,
-    'FALSE'   : true,
-    'NULL'    : true
-  }
-
   var cmpPrefixMap = {
     '+' : true,
     '-' : true,
@@ -148,7 +102,7 @@
 }
 
 start 
-  = &init __ ast:(union_stmt  / update_stmt / replace_insert_stmt) {
+  = &init __ ast:(union_stmt  / update_stmt / replace_insert_stmt ) {
       return {
         ast   : ast,
         param : params
@@ -226,7 +180,7 @@ from_clause
   = KW_FROM __ l:table_ref_list { return l; }
 
 table_ref_list
-  = head:table_base 
+  = head:table_base
     tail:table_ref*  {
       tail.unshift(head);
       return tail;
@@ -255,39 +209,46 @@ table_join
  
 //NOTE that ,the table assigned to `var` shouldn't write in `table_join`
 table_base 
-  = t:table_name __ KW_AS? __ alias:ident? {
+  = db:db_name __ DOT __ t:table_name __ KW_AS? __ alias:ident? {
       if (t.type == 'var') {
         t.as = alias;
         return t;
       } else {
         return  {
-          db    : t.db,
-          table : t.table,
+          db    : db,
+          table : t,
           as    : alias
         }
       }
-    } 
+    }
+  / t:table_name __ KW_AS? __ alias:ident? {
+      if (t.type == 'var') {
+        t.as = alias;
+        return t;
+      } else {
+        return  {
+          db    : '',
+          table : t,
+          as    : alias
+        }
+      }
+    }
 
 join_op
   = KW_LEFT __ KW_JOIN { return 'LEFT JOIN'; } 
   / (KW_INNER __)? KW_JOIN { return 'INNER JOIN'; }
 
-table_name 
-  = dt:ident tail:(__ DOT __ ident_name)? {
-      var obj = {
-        db : '',
-        table : dt
-      }
-      if (tail != '') {
-        obj.db = dt;
-        obj.table = tail[3];
-      } 
-      return obj;
+db_name
+  = db:ident_name {
+    return db;
+  }
+
+table_name
+  = table:ident {
+      return table;
     }
     /v:var_decl {
-      v.db = '';
-      v.table = v.name;
-      return v;
+      return v.name;
     }
 
 on_clause 
@@ -346,18 +307,32 @@ limit_clause
     }
 
 update_stmt
-  = KW_UPDATE    __ 
-    t:table_name __ 
-    KW_SET       __     
-    l:set_list   __  
+  = KW_UPDATE    __
+    db:db_name   __ DOT __
+    t:table_name __
+    KW_SET       __
+    l:set_list   __
     w:where_clause {
       return {
-        type  : 'update',  
-        db    : t.db,
-        table : t.table,
+        type  : 'update',
+        db    : db,
+        table : t,
         set   : l,
         where : w
-      }  
+      }
+    }
+  / KW_UPDATE    __
+    t:table_name __
+    KW_SET       __
+    l:set_list   __
+    w:where_clause {
+      return {
+        type  : 'update',
+        db    : '',
+        table : t,
+        set   : l,
+        where : w
+      }
     }
 
 set_list
@@ -371,26 +346,86 @@ set_list
  * 'col1 = (col2 > 3)'
  */
 set_item
-  = c:column_name __ '=' __ v:additive_expr {
+  = c:column __ '=' __ v:additive_expr {
       return {
+        column: c,
+        value : v
+      }
+    }
+  / t:ident __ DOT __ c:column __ '=' __ v:additive_expr {
+      return {
+        table: t,
         column: c,
         value : v
       }
     }
 
 replace_insert_stmt
-  = ri:replace_insert       __ 
-    KW_INTO                 __ 
-    t:table_name  __ LPAREN __ 
+  = ri:replace_insert       __
+    KW_INTO                 __
+    db:db_name    __  DOT   __
+    t:table_name  __ LPAREN __
+    c:column_list __ RPAREN __
+    v:value_clause             {
+      return {
+        type      : ri,
+        db        : db,
+        table     : t,
+        columns   : c,
+        values    : v
+      }
+    }
+  / ri:replace_insert       __
+    KW_INTO                 __
+    db:db_name       __ DOT __
+    t:table_name            __
+    KW_SET                  __
+    l:set_list              __
+    u:on_duplicate_key_update? {
+      var v = {
+        type  : ri,
+        db    : db,
+        table : t,
+        set   : l
+      };
+
+      if (u) {
+        v.duplicateSet = u;
+      }
+
+      return v;
+    }
+  / ri:replace_insert       __
+    KW_INTO                 __
+    t:table_name  __ LPAREN __
     c:column_list  __ RPAREN __
     v:value_clause             {
       return {
-        type      : ri,  
-        db        : t.db,
-        table     : t.table,
+        type      : ri,
+        db        : '',
+        table     : t,
         columns   : c,
         values    : v
-      }  
+      }
+    }
+  / ri:replace_insert       __
+    KW_INTO                 __
+    t:table_name            __
+    KW_SET                  __
+    l:set_list              __
+    u:on_duplicate_key_update? {
+      var v = {
+        type  : ri,
+        db    : '',
+        table : t,
+        set   : l
+      }
+
+      if (u) {
+        v.duplicateSet = u;
+      }
+
+      return v;
     }
 
 replace_insert
@@ -399,6 +434,11 @@ replace_insert
 
 value_clause
   = KW_VALUES __ l:value_list  { return l; }
+
+on_duplicate_key_update
+  = KW_ON __ KW_DUPLICATE __ KW_KEY __ KW_UPDATE __ l:set_list {
+    return l;
+  }
 
 value_list
   = head:value_item tail:(__ COMMA __ value_item)* {
@@ -614,14 +654,14 @@ primary
   / var_decl
 
 column_ref 
-  = tbl:ident __ DOT __ col:column { 
+  = tbl:ident __ DOT __ col:column {
       return {
         type  : 'column_ref',
         table : tbl, 
         column : col
       }; 
     } 
-  / col:column { 
+  / col:column {
       return {
         type  : 'column_ref',
         table : '', 
@@ -637,14 +677,17 @@ column_list
 ident = 
   name:ident_name !{ return reservedMap[name.toUpperCase()] === true; } {
     return name;  
-  } 
+  }
+  / '`' chars:[^`]+ '`' {
+    return chars.join('');
+  }
 
 column = 
   name:column_name !{ return reservedMap[name.toUpperCase()] === true; } {
-    return name;  
-  } 
-  /'`' chars:[^`]+ '`' {
-    return chars.join('');  
+    return name;
+  }
+  / '`' chars:[^`]+ '`' {
+    return chars.join('');
   }
 
 column_name 
@@ -834,66 +877,67 @@ e
   = e:[eE] sign:[+-]? { return e + sign; }
 
 
-KW_NULL     = "NULL"i     !ident_start 
-KW_TRUE     = "TRUE"i     !ident_start
-KW_FALSE    = "FALSE"i    !ident_start 
+KW_NULL      = "NULL"i     !ident_start
+KW_TRUE      = "TRUE"i     !ident_start
+KW_FALSE     = "FALSE"i    !ident_start
 
-KW_SHOW     = "SHOW"i     !ident_start
-KW_DROP     = "DROP"i     !ident_start
-KW_SELECT   = "SELECT"i   !ident_start 
-KW_UPDATE   = "UPDATE"i   !ident_start
-KW_CREATE   = "CREATE"i   !ident_start
-KW_DELETE   = "DELETE"i   !ident_start
-KW_INSERT   = "INSERT"i   !ident_start
-KW_REPLACE  = "REPLACE"i  !ident_start
-KW_EXPLAIN  = "EXPLAIN"i  !ident_start
+KW_SHOW      = "SHOW"i     !ident_start
+KW_DROP      = "DROP"i     !ident_start
+KW_SELECT    = "SELECT"i   !ident_start
+KW_UPDATE    = "UPDATE"i   !ident_start
+KW_CREATE    = "CREATE"i   !ident_start
+KW_DELETE    = "DELETE"i   !ident_start
+KW_INSERT    = "INSERT"i   !ident_start
+KW_REPLACE   = "REPLACE"i  !ident_start
+KW_EXPLAIN   = "EXPLAIN"i  !ident_start
 
-KW_INTO     = "INTO"i     !ident_start
-KW_FROM     = "FROM"i     !ident_start
-KW_SET      = "SET"i      !ident_start
+KW_INTO      = "INTO"i     !ident_start
+KW_FROM      = "FROM"i     !ident_start
+KW_SET       = "SET"i      !ident_start
 
-KW_AS       = "AS"i       !ident_start
-KW_TABLE    = "TABLE"i    !ident_start
+KW_AS        = "AS"i       !ident_start
+KW_TABLE     = "TABLE"i    !ident_start
 
-KW_ON       = "ON"i       !ident_start
-KW_LEFT     = "LEFT"i     !ident_start
-KW_INNER    = "INNER"i    !ident_start
-KW_JOIN     = "JOIN"i     !ident_start
-KW_UNION    = "UNION"i    !ident_start
-KW_VALUES   = "VALUES"i   !ident_start
+KW_ON        = "ON"i       !ident_start
+KW_LEFT      = "LEFT"i     !ident_start
+KW_INNER     = "INNER"i    !ident_start
+KW_JOIN      = "JOIN"i     !ident_start
+KW_UNION     = "UNION"i    !ident_start
+KW_VALUES    = "VALUES"i   !ident_start
 
-KW_EXISTS   = "EXISTS"i   !ident_start
+KW_EXISTS    = "EXISTS"i   !ident_start
 
-KW_WHERE    = "WHERE"i    !ident_start
+KW_WHERE     = "WHERE"i    !ident_start
 
-KW_GROUP    = "GROUP"i    !ident_start
-KW_BY       = "BY"i       !ident_start
-KW_ORDER    = "ORDER"i    !ident_start
-KW_HAVING   = "HAVING"i   !ident_start
+KW_GROUP     = "GROUP"i    !ident_start
+KW_BY        = "BY"i       !ident_start
+KW_ORDER     = "ORDER"i    !ident_start
+KW_HAVING    = "HAVING"i   !ident_start
 
-KW_LIMIT    = "LIMIT"i    !ident_start
+KW_LIMIT     = "LIMIT"i    !ident_start
 
-KW_ASC      = "ASC"i      !ident_start    { return 'ASC';     }
-KW_DESC     = "DESC"i     !ident_start    { return 'DESC';    }
+KW_ASC       = "ASC"i      !ident_start    { return 'ASC';      }
+KW_DESC      = "DESC"i     !ident_start    { return 'DESC';     }
 
-KW_ALL      = "ALL"i      !ident_start    { return 'ALL';     }
-KW_DISTINCT = "DISTINCT"i !ident_start    { return 'DISTINCT';}   
+KW_ALL       = "ALL"i      !ident_start    { return 'ALL';      }
+KW_DISTINCT  = "DISTINCT"i !ident_start    { return 'DISTINCT'; }
+KW_DUPLICATE = "DUPLICATE"i!ident_start    { return 'DUPLICATE';}
+KW_BETWEEN   = "BETWEEN"i  !ident_start    { return 'BETWEEN';  }
+KW_IN        = "IN"i       !ident_start    { return 'IN';       }
+KW_IS        = "IS"i       !ident_start    { return 'IS';       }
+KW_LIKE      = "LIKE"i     !ident_start    { return 'LIKE';     }
+KW_CONTAINS  = "CONTAINS"i !ident_start    { return 'CONTAINS'; }
+KW_KEY       = "KEY"i      !ident_start    { return 'KEY';      }
 
-KW_BETWEEN  = "BETWEEN"i  !ident_start    { return 'BETWEEN'; }
-KW_IN       = "IN"i       !ident_start    { return 'IN';      }
-KW_IS       = "IS"i       !ident_start    { return 'IS';      }
-KW_LIKE     = "LIKE"i     !ident_start    { return 'LIKE';    }
-KW_CONTAINS = "CONTAINS"i !ident_start    { return 'CONTAINS';}
+KW_NOT       = "NOT"i      !ident_start    { return 'NOT';      }
+KW_AND       = "AND"i      !ident_start    { return 'AND';      }
+KW_OR        = "OR"i       !ident_start    { return 'OR';       }
 
-KW_NOT      = "NOT"i      !ident_start    { return 'NOT';     }
-KW_AND      = "AND"i      !ident_start    { return 'AND';     }
-KW_OR       = "OR"i       !ident_start    { return 'OR';      }
-
-KW_COUNT    = "COUNT"i    !ident_start    { return 'COUNT';   }      
-KW_MAX      = "MAX"i      !ident_start    { return 'MAX';     }  
-KW_MIN      = "MIN"i      !ident_start    { return 'MIN';     }
-KW_SUM      = "SUM"i      !ident_start    { return 'SUM';     }
-KW_AVG      = "AVG"i      !ident_start    { return 'AVG';     }
+KW_COUNT     = "COUNT"i    !ident_start    { return 'COUNT';    }
+KW_MAX       = "MAX"i      !ident_start    { return 'MAX';      }
+KW_MIN       = "MIN"i      !ident_start    { return 'MIN';      }
+KW_SUM       = "SUM"i      !ident_start    { return 'SUM';      }
+KW_AVG       = "AVG"i      !ident_start    { return 'AVG';      }
 
 //specail character
 DOT       = '.'

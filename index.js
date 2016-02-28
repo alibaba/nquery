@@ -1,6 +1,5 @@
 exports.parse         = require('./lib/parser').parse;
 exports.tplParse      = require('./lib/parser').tplParse;
-
 exports.Table         = require('./lib/table');
 exports.Query         = require('./lib/query');
 exports.Parser        = require('./lib/parser');
